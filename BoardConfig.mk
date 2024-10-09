@@ -12,30 +12,71 @@ include device/motorola/sm6375-common/BoardConfigCommon.mk
 # Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := penang
 
+# Clang
+#TARGET_KERNEL_CLANG_COMPILE := true
+#TARGET_COMPILE_WITH_MSM_KERNEL := true
+#TARGET_KERNEL_CLANG_VERSION := r450784e
+
 # Kernel
 BOARD_KERNEL_CMDLINE += androidboot.hab.product=penang
-TARGET_KERNEL_CONFIG := vendor/holi-qgki_defconfig
-
-BOARD_KERNEL_BINARIES := kernel
-BOARD_PREBUILT_DTBOIMAGE := $(DEVICE_PATH)-kernel/dtbo.img
-TARGET_FORCE_PREBUILT_KERNEL := true
-TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)-kernel/kernel
-TARGET_KERNEL_CONFIG := holi_QGKI
-TARGET_PREBUILT_DTB := $(DEVICE_PATH)-kernel/dtb.img
-PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)-kernel/dtb.img:$(TARGET_COPY_OUT)/dtb.img \
-    $(DEVICE_PATH)-kernel/kernel:kernel \
-    $(call find-copy-subdir-files,*,$(DEVICE_PATH)-kernel/ramdisk-modules/,$(TARGET_COPY_OUT_VENDOR_RAMDISK)/lib/modules) \
-    $(call find-copy-subdir-files,*,$(DEVICE_PATH)-kernel/vendor-modules/,$(TARGET_COPY_OUT_VENDOR_DLKM)/lib/modules)
+TARGET_KERNEL_CONFIG := \
+    vendor/penang_defconfig \
+    vendor/ext_config/moto-holi.config
 
 # Kernel Modules
-BOARD_VENDOR_KERNEL_MODULES := \
-    $(wildcard $(DEVICE_PATH)-kernel/vendor-modules/*.ko)
-BOARD_VENDOR_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)-kernel/vendor-modules/modules.load))
-BOARD_VENDOR_KERNEL_MODULES_BLOCKLIST_FILE := $(DEVICE_PATH)-kernel/vendor-modules/modules.blocklist
-BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)-kernel/ramdisk-modules/modules.load))
+#BOARD_VENDOR_KERNEL_MODULES := \
+#    $(wildcard $(DEVICE_PATH)-kernel/vendor-modules/*.ko)
+BOARD_VENDOR_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)/modules.load))
+BOARD_VENDOR_KERNEL_MODULES_BLOCKLIST_FILE := $(DEVICE_PATH)/modules.blocklist
+BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD := $(strip $(shell cat $(DEVICE_PATH)/modules.load.recovery))
 BOOT_KERNEL_MODULES := $(BOARD_VENDOR_RAMDISK_RECOVERY_KERNEL_MODULES_LOAD)
-BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD := $(BOOT_KERNEL_MODULES)
+#BOARD_VENDOR_RAMDISK_KERNEL_MODULES_LOAD := $(BOOT_KERNEL_MODULES)
+
+# DT
+TARGET_KERNEL_ADDITIONAL_FLAGS += CONFIG_BUILD_ARM64_DT_OVERLAY=y
+
+# Kernel modules - Audio
+#TARGET_MODULE_ALIASES += \
+#    adsp_loader_dlkm.ko:audio_adsp_loader.ko \
+#    apr_dlkm.ko:audio_apr.ko \
+#    bolero_cdc_dlkm.ko:audio_bolero_cdc.ko \
+#    hdmi_dlkm.ko:audio_hdmi.ko \
+#    machine_dlkm.ko:audio_machine_lito.ko \
+#    mbhc_dlkm.ko:audio_mbhc.ko \
+#    native_dlkm.ko:audio_native.ko \
+#    pinctrl_lpi_dlkm.ko:audio_pinctrl_lpi.ko \
+#    platform_dlkm.ko:audio_platform.ko \
+#    q6_dlkm.ko:audio_q6.ko \
+#    q6_notifier_dlkm.ko:audio_q6_notifier.ko \
+#    q6_pdr_dlkm.ko:audio_q6_pdr.ko \
+#    rx_macro_dlkm.ko:audio_rx_macro.ko \
+#    snd_event_dlkm.ko:audio_snd_event.ko \
+#    stub_dlkm.ko:audio_stub.ko \
+#    swr_ctrl_dlkm.ko:audio_swr_ctrl.ko \
+#    swr_dlkm.ko:audio_swr.ko \
+#    tx_macro_dlkm.ko:audio_tx_macro.ko \
+#    usf_dlkm.ko:audio_usf.ko \
+#    va_macro_dlkm.ko:audio_va_macro.ko \
+#    wcd937x_dlkm.ko:audio_wcd937x.ko \
+#    wcd937x_slave_dlkm.ko:audio_wcd937x_slave.ko \
+#    wcd938x_dlkm.ko:audio_wcd938x.ko \
+#    wcd938x_slave_dlkm.ko:audio_wcd938x_slave.ko \
+#    wcd9xxx_dlkm.ko:audio_wcd9xxx.ko \
+#    wcd_core_dlkm.ko:audio_wcd_core.ko \
+#    wsa881x_dlkm.ko:audio_wsa881x.ko \
+#    wsa883x_dlkm.ko:audio_wsa883x.ko \
+#    wsa_macro_dlkm.ko:audio_wsa_macro.ko
+
+# Kernel modules - WLAN
+#TARGET_MODULE_ALIASES += \
+#    wlan.ko:qca_cld3_wlan.ko
+
+#BOOT_KERNEL_MODULES := \
+#    tcpc_sgm7220.ko \
+#    tcpc_rt1711h.ko \
+#    rt_pd_manager.ko \
+#    focaltech_0flash_v2_mmi.ko \
+#    nova_0flash_mmi.ko
 
 # HIDL
 DEVICE_MANIFEST_FILE += $(DEVICE_PATH)/manifest.xml
